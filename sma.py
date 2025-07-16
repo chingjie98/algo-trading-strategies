@@ -31,5 +31,26 @@ plt.xlabel("Time")
 plt.ylabel("Adjusted closing price")
 plt.show()
 
+data['returns'] = np.log(data['price'] / data['price'].shift(1))
 
+"""
+for extremely risk prudent strategy, 
+we go long-only given that we are trading on cash account, 
+no margin-call
+"""
+
+data['signal'] = np.where(data['SMA1'] > data['SMA2'], 1, 0)
+data.dropna(inplace = True)
+
+data['strategy'] = data['signal'].shift(1) * data['returns']
+cumulative = data[['returns', 'strategy']].cumsum().apply(np.exp)
+cumulative.columns = ['Buy & Hold', 'Strategy']
+
+plt.figure(figsize=(10,6))
+plt.plot(cumulative['Buy & Hold'], label="Buy & Hold")
+plt.plot(cumulative['Strategy'], label="Strategy")
+plt.legend()
+plt.title("Cumulative Gross Performance")
+plt.grid(True)
+plt.show()
 
