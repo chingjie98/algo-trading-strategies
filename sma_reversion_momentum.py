@@ -16,10 +16,12 @@ end = "2025-01-05"
 SMA1 = 10
 SMA2 = 30
 BB_WINDOW = 20
-MOMENTUM_WINDOW = 10
-MOMENTUM_THRESHOLD = 0.005
+MOMENTUM_WINDOW = 5
+MOMENTUM_THRESHOLD = 0.02
 VOL_WINDOW = 10
 VOL_THRESHOLD = 0.015 
+
+STOCK_TO_BACKTEST = "AAPL"
 
 # retrieve data
 def download_data(stocks, start, end):
@@ -28,8 +30,8 @@ def download_data(stocks, start, end):
 
 raw = download_data(stocks, start, end)
 
-data = pd.DataFrame(raw['AAPL'])
-data.rename(columns = {'AAPL' : "price"}, inplace = True)
+data = pd.DataFrame(raw[STOCK_TO_BACKTEST])
+data.rename(columns = {STOCK_TO_BACKTEST : "price"}, inplace = True)
 
 # SMA signal
 data['SMA1'] = data['price'].rolling(SMA1).mean()   
@@ -48,7 +50,7 @@ data['returns'] = np.log(data['price'] / data['price'].shift(1))
 data['volatility'] = data['returns'].rolling(VOL_WINDOW).std()
 
 def get_signal(row):
-    if row['SMA1'] > row['SMA2']:
+    if row['SMA1'] > row['SMA2'] * 0.98:
          # Low volatility → mean-reversion strategy
         if row['volatility'] <= VOL_THRESHOLD:
             if row['price'] < row['lower_bb']:
@@ -58,6 +60,7 @@ def get_signal(row):
         else:
             if row['momentum'] > MOMENTUM_THRESHOLD:
                 return 'MOM'
+        
     return "NONE"
 
 data['regime'] = data.apply(get_signal, axis=1)
