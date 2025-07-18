@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 
-stocks = ["AAPL", "MSFT"]
+stocks = ["AAPL", "MSFT", "EURUSD=X", "SPY", "QQQ"]
 start = "2010-01-05"
 end = "2025-01-05"
 
@@ -21,7 +21,7 @@ MOMENTUM_THRESHOLD = 0.02
 VOL_WINDOW = 10
 VOL_THRESHOLD = 0.015 
 
-STOCK_TO_BACKTEST = "AAPL"
+STOCK_TO_BACKTEST = "SPY"
 
 # retrieve data
 def download_data(stocks, start, end):
@@ -75,7 +75,7 @@ plt.figure(figsize=(10,6))
 plt.plot(cumulative['Benchmark'], label="Buy & Hold")
 plt.plot(cumulative['Strategy'], label="Strategy")
 plt.legend()
-plt.title("Cumulative Gross Performance")
+plt.title(f"Cumulative Gross Performance for {STOCK_TO_BACKTEST}")
 plt.grid(True)
 plt.show()
 
